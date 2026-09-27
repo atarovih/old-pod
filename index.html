@@ -256,8 +256,8 @@
   </div>
 
   <script>
-    // Настройки JSONBin.io
-    const BIN_ID = '6ab965b8ffd5d160533535bf';
+    // Настройки JSONBin.io (обновленный Бин)
+    const BIN_ID = '6ab96850ffd5d16053353c02';
     const MASTER_KEY = '$2a$10$e8oewhCaBua9f45QeskiN.2PgnsuzYZXHBGm99FxZ0ux2ioeQo8q';
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
@@ -315,7 +315,7 @@
       else backBtn.classList.add('hidden');
     }
 
-    // Загрузка объявлений из JSONBin.io
+    // Загрузка объявлений из JSONBin.io (формат с полем ads)
     async function renderCatalog() {
       const grid = document.getElementById('catalogGrid');
       
@@ -324,7 +324,7 @@
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const json = await response.json();
-        adsData = json.record;
+        adsData = json.record?.ads;
         if (!Array.isArray(adsData)) adsData = [];
       } catch (e) {
         console.error('Ошибка загрузки:', e);
@@ -346,7 +346,7 @@
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const json = await response.json();
-        adsData = json.record;
+        adsData = json.record?.ads;
         if (!Array.isArray(adsData)) adsData = [];
       } catch (e) {
         adsData = [];
@@ -409,7 +409,7 @@
       });
     }
 
-    // Публикация нового объявления в JSONBin.io
+    // Публикация нового объявления в JSONBin.io (с сохранением в формате { ads: [...] })
     async function handleAdSubmit(e) {
       e.preventDefault();
       
@@ -430,13 +430,8 @@
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const json = await getRes.json();
-        let currentAds = json.record;
+        let currentAds = json.record?.ads;
         if (!Array.isArray(currentAds)) currentAds = [];
-
-        // Убираем старый тестовый массив, если там был только "test"
-        if (currentAds.length === 1 && currentAds[0] === "test") {
-          currentAds = [];
-        }
 
         currentAds.unshift(newAd);
 
@@ -446,7 +441,7 @@
             'Content-Type': 'application/json',
             'X-Master-Key': MASTER_KEY
           },
-          body: JSON.stringify(currentAds)
+          body: JSON.stringify({ ads: currentAds })
         });
 
         if (!saveRes.ok) throw new Error('Ошибка сохранения');
@@ -473,7 +468,7 @@
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const json = await getRes.json();
-        let currentAds = json.record;
+        let currentAds = json.record?.ads;
         if (!Array.isArray(currentAds)) currentAds = [];
 
         currentAds = currentAds.filter(ad => ad.id !== adId);
@@ -484,7 +479,7 @@
             'Content-Type': 'application/json',
             'X-Master-Key': MASTER_KEY
           },
-          body: JSON.stringify(currentAds)
+          body: JSON.stringify({ ads: currentAds })
         });
 
         if (!saveRes.ok) throw new Error('Ошибка удаления');
